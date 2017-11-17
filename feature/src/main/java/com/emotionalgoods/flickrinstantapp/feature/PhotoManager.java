@@ -87,4 +87,10 @@ public class PhotoManager {
     public void setLoading(boolean loading) {
         this.loading = loading;
     }
+
+    public void reset() {
+        photoList.clear();
+        page = 1;
+        photosAddedPublisher.onNext(page);
+    }
 }

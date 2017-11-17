@@ -26,5 +26,6 @@ android {
 
 dependencies {
     implementation project(':feature')
+    implementation project(':search')
     implementation project(':base')
 }

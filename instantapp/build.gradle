@@ -3,5 +3,6 @@ apply plugin: 'com.android.instantapp'
 dependencies {
     implementation project(':mainmenu')
     implementation project(':feature')
+    implementation project(':search')
     implementation project(':base')
 }

@@ -18,13 +18,22 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.showPhotos).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPhotos();
+                showPhotos(false);
+            }
+        });
+
+        findViewById(R.id.searchPhotos).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPhotos(true);
             }
         });
     }
 
-    private void showPhotos() {
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://emotionalgoods.com/flickr"));
+    private void showPhotos(boolean search) {
+        String url = "https://emotionalgoods.com/flickr" + (search ? "/search" : "");
+
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.setPackage(getPackageName());
         intent.addCategory(Intent.CATEGORY_BROWSABLE);
 

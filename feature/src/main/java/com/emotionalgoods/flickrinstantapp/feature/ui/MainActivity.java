@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.emotionalgoods.flickrinstantapp.feature.PhotoManager;
 import com.emotionalgoods.flickrinstantapp.feature.R;
@@ -26,17 +29,29 @@ public class MainActivity extends AppCompatActivity {
     private PhotoManager photoManager;
     private PhotoAdapter photoAdapter;
     private ProgressBar progressBar;
+    private TextView searchPlaceholder;
     private Disposable onPhotosAdded;
+
+    private boolean searchable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_main);
+
+        final ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHideOnContentScrollEnabled(true);
+        }
+
         photoManager = new PhotoManager(this);
 
-        setContentView(R.layout.activity_main);
         photoGridView = findViewById(R.id.photoGridView);
         progressBar = findViewById(R.id.progressBar);
+        searchPlaceholder = findViewById(R.id.searchPlaceholder);
 
         photoAdapter = new PhotoAdapter(photoManager.getPhotoList());
         photoGridView.setAdapter(photoAdapter);
@@ -87,11 +102,17 @@ public class MainActivity extends AppCompatActivity {
             public void accept(Integer integer) throws Exception {
                 photoAdapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
+                searchPlaceholder.setVisibility(View.GONE);
             }
         });
 
-        photoManager.setSearchTerm("tomato");
-        photoManager.loadMorePhotos();
+        if (!isSearchable()) {
+            photoManager.setSearchTerm("tomato");
+            photoManager.loadMorePhotos();
+        } else {
+            progressBar.setVisibility(View.GONE);
+            searchPlaceholder.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -104,6 +125,33 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateLayoutManager();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void setLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public boolean isSearchable() {
+        return searchable;
+    }
+
+    public PhotoManager getPhotoManager() {
+        return photoManager;
+    }
+
+    public void setSearchable(boolean searchable) {
+        this.searchable = searchable;
     }
 
     private void updateLayoutManager() {

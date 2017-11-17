@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,17 +76,22 @@ public class FlickrApi {
                             return;
                         }
 
-                        JsonArray results = gson.fromJson(
-                                response.body().charStream(),
-                                JsonObject.class
-                        ).getAsJsonObject("photos").getAsJsonArray("photo");
-
                         List<PhotoModel> photos = new ArrayList<>();
 
-                        for (JsonElement result : results) {
-                            String url = makePhotoUrl(result.getAsJsonObject());
-                            String title = result.getAsJsonObject().get("title").getAsString();
-                            photos.add(new PhotoModel(url, title));
+                        try {
+                            JsonArray results = gson.fromJson(
+                                    response.body().charStream(),
+                                    JsonObject.class
+                            ).getAsJsonObject("photos").getAsJsonArray("photo");
+
+
+                            for (JsonElement result : results) {
+                                String url = makePhotoUrl(result.getAsJsonObject());
+                                String title = result.getAsJsonObject().get("title").getAsString();
+                                photos.add(new PhotoModel(url, title));
+                            }
+                        } catch (NullPointerException | JsonSyntaxException e) {
+                            // ignored
                         }
 
                         emitter.onSuccess(photos);
