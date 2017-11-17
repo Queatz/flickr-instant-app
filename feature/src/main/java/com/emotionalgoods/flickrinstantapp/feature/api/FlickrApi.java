@@ -1,7 +1,7 @@
 package com.emotionalgoods.flickrinstantapp.feature.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,6 +36,8 @@ public class FlickrApi {
     private final OkHttpClient client;
     private final Gson gson;
 
+    private String baseUrl = FLICKR_API;
+
     public FlickrApi() {
         client = new OkHttpClient().newBuilder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -49,7 +51,7 @@ public class FlickrApi {
         return Single.create(new SingleOnSubscribe<List<PhotoModel>>() {
             @Override
             public void subscribe(final SingleEmitter<List<PhotoModel>> emitter) throws Exception {
-                HttpUrl.Builder httpBuilder = HttpUrl.parse(FLICKR_API).newBuilder();
+                HttpUrl.Builder httpBuilder = HttpUrl.parse(baseUrl).newBuilder();
                 httpBuilder.addQueryParameter("method", "flickr.photos.search");
                 httpBuilder.addQueryParameter("api_key", apiKey);
                 httpBuilder.addQueryParameter("text", search);
@@ -57,8 +59,6 @@ public class FlickrApi {
                 httpBuilder.addQueryParameter("page", String.valueOf(page));
                 httpBuilder.addQueryParameter("format", "json");
                 httpBuilder.addQueryParameter("nojsoncallback", "1");
-
-                Log.w("FLICKR", httpBuilder.build().toString());
 
                 final Request request = new Request.Builder().url(httpBuilder.build()).build();
 
@@ -102,5 +102,10 @@ public class FlickrApi {
         String secret = photo.get("secret").getAsString();
 
         return String.format(FLICKR_PHOTO_URL, farm, server, id, secret);
+    }
+
+    @VisibleForTesting
+    protected void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 }
