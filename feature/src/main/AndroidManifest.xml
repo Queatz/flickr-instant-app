@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.emotionalgoods.flickrinstantapp.feature">
+
+    <application>
+        <activity android:name="com.emotionalgoods.flickrinstantapp.feature.ui.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter android:order="1">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="emotionalgoods.com"
+                    android:pathPattern="/flickr"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
