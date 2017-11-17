@@ -26,23 +26,37 @@ public class PhotoManager {
 
     private String searchTerm;
     private int page;
+    private boolean loading;
 
     public PhotoManager(Context context) {
         this.context = context;
-        page = 0;
+        page = 1;
         flickrApi = new FlickrApi();
         photoList = new ArrayList<>();
         photosAddedPublisher = PublishSubject.create();
     }
 
     public void loadMorePhotos() {
-        flickrApi.searchPhotos(context.getString(R.string.flickrApiKey), searchTerm)
+        if (loading) {
+            return;
+        }
+
+        loading = true;
+
+        flickrApi.searchPhotos(context.getString(R.string.flickrApiKey), searchTerm, page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        loading = false;
+                    }
+                })
                 .subscribe(new Consumer<List<PhotoModel>>() {
                     @Override
                     public void accept(List<PhotoModel> photos) throws Exception {
                         page++;
+                        loading = false;
 
                         PhotoManager.this.photoList.addAll(photos);
                         photosAddedPublisher.onNext(page);
@@ -65,5 +79,13 @@ public class PhotoManager {
     public PhotoManager setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
         return this;
+    }
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading = loading;
     }
 }

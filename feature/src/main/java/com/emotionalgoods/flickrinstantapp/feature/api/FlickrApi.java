@@ -45,7 +45,7 @@ public class FlickrApi {
         gson = new GsonBuilder().create();
     }
 
-    public Single<List<PhotoModel>> searchPhotos(final String apiKey, final String search) {
+    public Single<List<PhotoModel>> searchPhotos(final String apiKey, final String search, final int page) {
         return Single.create(new SingleOnSubscribe<List<PhotoModel>>() {
             @Override
             public void subscribe(final SingleEmitter<List<PhotoModel>> emitter) throws Exception {
@@ -54,7 +54,7 @@ public class FlickrApi {
                 httpBuilder.addQueryParameter("api_key", apiKey);
                 httpBuilder.addQueryParameter("text", search);
                 httpBuilder.addQueryParameter("per_page", "30");
-                httpBuilder.addQueryParameter("page", "1");
+                httpBuilder.addQueryParameter("page", String.valueOf(page));
                 httpBuilder.addQueryParameter("format", "json");
                 httpBuilder.addQueryParameter("nojsoncallback", "1");
 

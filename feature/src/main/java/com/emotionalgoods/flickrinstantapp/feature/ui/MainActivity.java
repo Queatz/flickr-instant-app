@@ -12,6 +12,7 @@ import com.emotionalgoods.flickrinstantapp.feature.PhotoManager;
 import com.emotionalgoods.flickrinstantapp.feature.R;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private PhotoManager photoManager;
     private PhotoAdapter photoAdapter;
     private ProgressBar progressBar;
+    private Disposable onPhotosAdded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +38,26 @@ public class MainActivity extends AppCompatActivity {
         photoAdapter = new PhotoAdapter(photoManager.getPhotoList());
         photoGridView.setAdapter(photoAdapter);
 
+        photoGridView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (photoManager.isLoading() || photoManager.getPhotoList().isEmpty()) {
+                    return;
+                }
+
+                int offset = recyclerView.computeVerticalScrollOffset();
+                int extent = recyclerView.computeVerticalScrollExtent();
+                int range = recyclerView.computeVerticalScrollRange();
+
+                if (offset + extent * 2 >= range) {
+                    photoManager.loadMorePhotos();
+                }
+            }
+        });
+
         updateLayoutManager();
 
-        photoManager.onPhotosAdded()
+        onPhotosAdded = photoManager.onPhotosAdded()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Integer>() {
             @Override
@@ -50,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
         photoManager.setSearchTerm("tomato");
         photoManager.loadMorePhotos();
+    }
+
+    @Override
+    protected void onDestroy() {
+        onPhotosAdded.dispose();
+        super.onDestroy();
     }
 
     @Override
