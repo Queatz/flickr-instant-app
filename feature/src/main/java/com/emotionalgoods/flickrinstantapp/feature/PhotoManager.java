@@ -46,12 +46,6 @@ public class PhotoManager {
         flickrApi.searchPhotos(context.getString(R.string.flickrApiKey), searchTerm, page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        loading = false;
-                    }
-                })
                 .subscribe(new Consumer<List<PhotoModel>>() {
                     @Override
                     public void accept(List<PhotoModel> photos) throws Exception {
@@ -60,6 +54,11 @@ public class PhotoManager {
 
                         PhotoManager.this.photoList.addAll(photos);
                         photosAddedPublisher.onNext(page);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        loading = false;
                     }
                 });
     }

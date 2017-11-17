@@ -45,9 +45,17 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                int offset = recyclerView.computeVerticalScrollOffset();
-                int extent = recyclerView.computeVerticalScrollExtent();
-                int range = recyclerView.computeVerticalScrollRange();
+                int offset = isHorizontal() ?
+                        recyclerView.computeHorizontalScrollOffset() :
+                        recyclerView.computeVerticalScrollOffset();
+
+                int extent = isHorizontal() ?
+                        recyclerView.computeHorizontalScrollExtent() :
+                        recyclerView.computeVerticalScrollExtent();
+
+                int range = isHorizontal() ?
+                        recyclerView.computeHorizontalScrollRange() :
+                        recyclerView.computeVerticalScrollRange();
 
                 if (offset + extent * 2 >= range) {
                     photoManager.loadMorePhotos();
@@ -84,15 +92,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateLayoutManager() {
-        boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-        int orientation = landscape ? GridLayoutManager.HORIZONTAL : GridLayoutManager.VERTICAL;
+        int orientation = isHorizontal() ? GridLayoutManager.HORIZONTAL : GridLayoutManager.VERTICAL;
 
         photoAdapter.setOrientation(orientation);
+
+        photoGridView.setVerticalScrollBarEnabled(orientation == GridLayoutManager.VERTICAL);
+        photoGridView.setHorizontalScrollBarEnabled(orientation == GridLayoutManager.HORIZONTAL);
 
         GridLayoutManager layoutManager;
         layoutManager = new GridLayoutManager(this, PHOTO_GRID_COLUMNS, orientation, false);
         photoGridView.setLayoutManager(layoutManager);
 
         photoGridView.getRecycledViewPool().clear();
+    }
+
+    private boolean isHorizontal() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 }
