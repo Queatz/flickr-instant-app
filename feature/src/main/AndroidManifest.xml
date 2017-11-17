@@ -19,6 +19,19 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity android:name="com.emotionalgoods.flickrinstantapp.feature.ui.DetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter android:order="1">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="emotionalgoods.com"
+                    android:pathPattern="/flickr/photo"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

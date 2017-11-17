@@ -1,6 +1,8 @@
 package com.emotionalgoods.flickrinstantapp.feature.ui;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,6 +12,7 @@ import android.widget.ProgressBar;
 
 import com.emotionalgoods.flickrinstantapp.feature.PhotoManager;
 import com.emotionalgoods.flickrinstantapp.feature.R;
+import com.emotionalgoods.flickrinstantapp.feature.api.PhotoModel;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -60,6 +63,18 @@ public class MainActivity extends AppCompatActivity {
                 if (offset + extent * 2 >= range) {
                     photoManager.loadMorePhotos();
                 }
+            }
+        });
+
+        photoAdapter.onPhotoClicked().subscribe(new Consumer<PhotoModel>() {
+            @Override
+            public void accept(PhotoModel photo) throws Exception {
+                final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://emotionalgoods.com/flickr/photo"));
+                intent.setPackage(getPackageName());
+                intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                intent.putExtra(Extras.PHOTO_URL, photo.getUrl());
+                intent.putExtra(Extras.PHOTO_TITLE, photo.getTitle());
+                startActivity(intent);
             }
         });
 
